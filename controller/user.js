@@ -1,6 +1,7 @@
-const multer = require('multer');
-const uuid = require('uuid').v4;
-const user=require('../model/User');
+const bcrypt = require('bcryptjs');
+const passport = require("passport");
+
+const User=require('../model/User');
 
 exports.registerUser=async(req,res)=>{
 
@@ -14,77 +15,43 @@ exports.registerUser=async(req,res)=>{
     const{fullName,email,password} = req.body;
     // console.log(User.find())
     try {
+        await User.userValidation(req.body)
         const userFilter = await user.findOne({ email });
-        if(!userFilter){
-
-            user.create({fullName,email,password})
+        if (!userFilter) {
+            const hash = await bcrypt.hash(password,10)
+            await user.create({fullName,email,password:hash})
             res.status(201).json({message:"created person"})
-        }else{
+        }
+        else{
             res.status(203).json({message:"person already exist"})
 
         }
     } catch (err) {
-        console.log(err)
+        // const errors = [];
+        // err.inner.forEach((e) => {
+        //     errors.push({
+        //         name: e.path,
+        //         message: e.message,
+        //     });
+        // });
+        // res.json(errors)
     }
 }
 
-exports.loginUser=async(req,res)=>{
-
-    res.setHeader("Access-Control-Allow-Origin", "*")
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader("Access-Control-Max-Age", "1800");
-    res.setHeader("Access-Control-Allow-Headers", "content-type");
-    res.setHeader("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS")
-    res.setHeader("Content-Type", "application/x-www-form-urlencoded")
-
-    const{email,password} = req.body;
-    console.log(email,password)
+exports.handleLogin =async (req, res, next) => {
     try {
-        const userEmail = await user.findOne({ email });
-        const userPassword = await user.findOne({ password });
-        if(userEmail && userPassword){
-            res.status(201).json(userEmail.fullName)
-        }else{
-            res.status(203).json({message:"join error"})
-        }
+        const findUser = await User.findOne({ email:req.body.email });
+        console.log(findUser.fullName)
+        passport.authenticate('local', function(err, user) {
+        if (err) { return next(err); } 
+        if (!user) {
+            res.status(203).json({ message: "کاربر وجود ندارد" }); 
+        } else {
+            
+            res.status(201).json(findUser.fullName);
+        } 
+    })(req, res, next)
     } catch (err) {
         console.log(err)
     }
 }
-
-exports.uploadImage = (req, res) => {
-    // let fileName = `${uuid()}.jpg`;
-
-    const storage = multer.diskStorage({
-        destination: (req, file, cb) => {
-            cb(null, "./public/uploads/");
-        },
-        filename: (req, file, cb) => {
-            console.log(file);
-            cb(null, `${uuid()}_${file.originalname}`);
-        }, 
-    });
-
-    const fileFilter = (req, file, cb) => {
-        if (file.mimetype == "image/jpeg") {
-            cb(null, true);
-        } else {
-            cb("تنها پسوند JPEG پشتیبانی میشود", false);
-        }
-    };
-
-    const upload = multer({
-        limits: { fileSize: 4000000 },
-        dest: "uploads/",
-        storage: storage,
-        fileFilter: fileFilter,
-    }).single("image");
-
-    upload(req, res, (err) => {
-        if(req.file){
-            res.status(200).send("آپلود عکس موفقیت آمیز بود");
-        }else{
-            res.send("جهت آپلود باید عکسی انتخاب کنید")
-        }
-    });
-};

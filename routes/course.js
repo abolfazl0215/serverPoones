@@ -1,7 +1,7 @@
-const express = require('express');
+const {Router} = require('express');
 const courseController=require('../controller/courses');
 
-const router=express.Router();
+const router=new Router();
 
 router.post("/course",courseController.getCourse)
 
