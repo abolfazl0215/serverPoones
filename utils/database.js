@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 
-const connectDB= async () =>{
+const connectDB = async () => {
+    // mongodb://pounesir_pounes:abolfazl021@localhost:27017/pounesir_db
     try {
-        const conn= await mongoose.connect(process.env.MONGO_URI,{
+        const conn= await mongoose.connect('mongodb://localhost:27017/nemiare',{
             useNewUrlParser:true,
             useUnifiedTopology:true
         })

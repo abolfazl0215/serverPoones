@@ -7,7 +7,7 @@ const userSchema=new mongoose.Schema({
         required:true,
         trim:true,
         minlength:3,
-        maxlength:25
+        maxlength:250
     },
     email: {
         unique:true,
@@ -36,13 +36,10 @@ const schema=Yup.object().shape({
         .required("4")
         .trim()
         .min(3,"5")
-        .max(50,"6"),
+        .max(200,"6"),
     password:
         Yup.string()
-        .required("7")
-        .trim()
-        .min(3,"8")
-        .max(50,"9"),
+        .required("7"),
     confirmPassword:
         Yup.string()
         .required("10")
