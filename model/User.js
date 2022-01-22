@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Yup = require('yup');
+const {v4: uuidv4} = require('uuid');
 
 const userSchema=new mongoose.Schema({
     fullName:{
@@ -22,6 +23,11 @@ const userSchema=new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    courses: {
+        type:Object,
+        required:true,
+        default: []
+    }
 })
 
 const schema=Yup.object().shape({

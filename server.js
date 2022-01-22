@@ -3,8 +3,6 @@ const cors = require('cors');
 const path = require('path');
 const bodyParser=require('body-parser');
 const dotEnv = require('dotenv');
-const passport = require("passport");
-const session = require('express-session');
 
 const userRoutes=require('./routes/user');
 const courseRoutes = require('./routes/course');
@@ -19,9 +17,6 @@ dotEnv.config({path:"./config/config.env"})
 
 // connect to database
 connectDB()
-
-//* Passport Configuration
-require("./config/passport");
 
 const app=express();
 
@@ -39,21 +34,6 @@ app.use(express.static(path.join(__dirname,"public")))
 // set template engine
 app.set("view engine","ejs")
 app.set("views", "views")
-
-//* Session
-app.use(
-    session({
-        secret: "secret",
-        cookie: { maxAge: 60000 },
-        resave: false,
-        saveUninitialized: false,
-    })
-);
-
-//* Passport
-app.use(passport.initialize());
-app.use(passport.session());
-
 
 //routes
 app.use(courseRoutes)
