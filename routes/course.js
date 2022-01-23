@@ -5,6 +5,7 @@ const router = new Router();
 
 // router.post("/course",courseController.getCourse)
 router.post("/registerCourse",courseController.registerCourse)
+router.post("/getLength",courseController.getLength)
 // router.post("/getLength",courseController.getLength)
 
 

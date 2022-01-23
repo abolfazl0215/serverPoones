@@ -30,7 +30,7 @@ exports.registerUser=async(req,res)=>{
                 res.status(201).json({ token})
             }
         else{
-            res.status(203).json({message:"person already exist"})
+            res.status(422).json({message:"person already exist"})
         }
     } catch (err) {
         console.log(err)
@@ -50,9 +50,7 @@ exports.handleLogin = async (req, res, next) => {
         const user =await User.findOne({ email });
         console.log(user)
         if (!user) {
-            const error = new Error("کاربر وجود ندارد");
-            error.statusCode = 404;
-            throw error;
+            res.status(404);
         }
 
         const isEqual = await bcrypt.compare(password, user.password);
@@ -69,11 +67,9 @@ exports.handleLogin = async (req, res, next) => {
                 },
                 process.env.JWT_SECRET
             );
-            res.status(200).json({ token});
+            res.status(200).json({token});
         } else {
-            const error = new Error("آدرس ایمیل یا کلمه عبور اشتباه است");
-            error.statusCode = 422;
-            throw error;
+            res.status(422).json("آدرس ایمیل یا کلمه عبور اشتباه است");
         }
     } catch (err) {
         next(err)
